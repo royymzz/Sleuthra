@@ -43,6 +43,8 @@ def check_extension_mismatch(file_path, detected_type):
     return True
 
 def analyze_file(file_path):
+    findings = []
+
     print(f"Found file: {file_path.name}")
     print(f" Extension: {file_path.suffix}")
     print(f" Size: {file_path.stat().st_size} bytes")
@@ -74,7 +76,34 @@ def analyze_file(file_path):
     mismatch = check_extension_mismatch(file_path, detected_type)
 
     if mismatch:
-        print(" WARNING: File extension does not match detected content!")
+        findings.append(
+            f"Extension mismatch: {file_path.suffix} extension, "
+            f"but detected as {detected_type}"
+        )
+
+    if findings:
+        print(" Findings:")
+
+        for finding in findings: 
+            print(f" [WARNING] {finding}")
+
+    else:
+        print(" Findings: None")
+
+    result = {
+        "name": file_path.name,
+        "extension": file_path.suffix,
+        "size": file_stats.st_size,
+        "modified": modified_time,
+        "accessed": accessed_time,
+        "metadata_changed": changed_time,
+        "sha256": file_hash,
+        "detected_type": detected_type,
+        "findings": findings,
+    }
+
+    return result
+
 
 project_folder = Path(__file__).resolve().parent
 
@@ -90,9 +119,13 @@ if not scan_folder.exists():
 
 print(f"\nScanning: {scan_folder}")
 
+analysis_results = []
+
 for item in sorted(scan_folder.iterdir()):
     if item.is_file():
-        analyze_file(item)
+        result = analyze_file(item)
+        analysis_results.append(result)
+
 
 
         

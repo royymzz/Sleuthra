@@ -21,6 +21,8 @@ Sleuthra currently supports:
   - Access time
   - Metadata change time
 - Basic error handling for missing scan directories
+- Structured forensic findings for detected anomalies
+- Structured per-file analysis results for future reporting
 
 ## Example Finding
 
