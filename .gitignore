@@ -1,0 +1,15 @@
+# Python virtual environment
+.venv/
+
+# Python cache files
+__pycache__/
+*.pyc
+
+# VS Code local settings
+.vscode/
+
+# Generated reports
+reports/
+
+# Forensic evidence / user-supplied files
+evidence/
