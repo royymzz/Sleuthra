@@ -102,3 +102,10 @@ The roadmap may change as the project develops.
 ## Disclaimer
 
 Sleuthra is currently an educational project under active development. It is not intended to replace established professional digital forensic tools or validated forensic procedures.
+
+## Copyright
+
+Copyright © 2026 royymzz. All rights reserved.
+
+No license is currently granted for copying, modifying, distributing,
+or using this project's source code.
