@@ -126,7 +126,15 @@ for item in sorted(scan_folder.rglob("*")):
         result = analyze_file(item)
         analysis_results.append(result)
 
+total_files = len(analysis_results)
 
+total_findings = sum(
+    len(result["findings"])
+    for result in analysis_results
+)
 
+print("\nScan complete.")
+print(f"Files analyzed: {total_files}")
+print(f"Warnings found: {total_findings}")
         
 
