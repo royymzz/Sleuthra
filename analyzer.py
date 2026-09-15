@@ -121,7 +121,7 @@ print(f"\nScanning: {scan_folder}")
 
 analysis_results = []
 
-for item in sorted(scan_folder.iterdir()):
+for item in sorted(scan_folder.rglob("*")):
     if item.is_file():
         result = analyze_file(item)
         analysis_results.append(result)
