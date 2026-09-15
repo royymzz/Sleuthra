@@ -10,7 +10,7 @@ The project is being developed as a learning-focused digital forensics tool for 
 
 Sleuthra currently supports:
 
-- File discovery within a target directory
+- Recursive file discovery across a target directory and its subdirectories
 - File extension identification
 - File size collection
 - SHA-256 hashing
@@ -23,6 +23,7 @@ Sleuthra currently supports:
 - Basic error handling for missing scan directories
 - Structured forensic findings for detected anomalies
 - Structured per-file analysis results for future reporting
+- End-of-scan summary showing files analyzed and warnings found
 
 ## Example Finding
 
@@ -72,7 +73,9 @@ Run the analyzer from the project directory:
 python analyzer.py
 ```
 
-The analyzer currently scans the local `test_files` directory.
+The analyzer currently scans the local `test_files` directory recursively, including files inside nested subdirectories.
+
+At the end of a scan, Sleuthra reports the number of files analyzed and the total number of warnings found.
 
 ## Forensic Considerations
 
@@ -81,7 +84,7 @@ Sleuthra reports filesystem metadata as evidence but does not assume that metada
 For example:
 
 - Modification time represents the filesystem's recorded content modification time.
-- Access time may be affected by filesystem mount settings.
+- Access time may be affected by filesystem mount settings and by file access during analysis.
 - On Linux, `ctime` represents metadata/status change time, not file creation time.
 - File extensions alone are not considered reliable indicators of actual file content.
 
@@ -89,8 +92,6 @@ For example:
 
 Planned areas of development include:
 
-- Structured forensic findings
-- Improved directory scanning
 - Structured report generation
 - Additional metadata extraction
 - Improved file-type analysis
