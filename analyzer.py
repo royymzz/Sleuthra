@@ -1,6 +1,7 @@
 from pathlib import Path 
 import hashlib 
 import subprocess
+import json
 from datetime import datetime
 
 def calculate_sha256(file_path):
@@ -42,7 +43,7 @@ def check_extension_mismatch(file_path, detected_type):
 
     return True
 
-def analyze_file(file_path):
+def analyze_file(file_path, scan_folder):
     findings = []
 
     print(f"Found file: {file_path.name}")
@@ -92,6 +93,7 @@ def analyze_file(file_path):
 
     result = {
         "name": file_path.name,
+        "path": str(file_path.relative_to(scan_folder)),
         "extension": file_path.suffix,
         "size": file_stats.st_size,
         "modified": modified_time,
@@ -103,6 +105,14 @@ def analyze_file(file_path):
     }
 
     return result
+
+def save_json_report(results, report_path): 
+    report_path.parent.mkdir(parents=True, exist_ok=True)
+
+    with open(report_path, "w", encoding="utf-8") as report_file:
+        json.dump(results, report_file, indent=4)
+
+    print(f"\nJSON report saved: {report_path}")
 
 
 project_folder = Path(__file__).resolve().parent
@@ -123,7 +133,7 @@ analysis_results = []
 
 for item in sorted(scan_folder.rglob("*")):
     if item.is_file():
-        result = analyze_file(item)
+        result = analyze_file(item, scan_folder)
         analysis_results.append(result)
 
 total_files = len(analysis_results)
@@ -137,4 +147,6 @@ print("\nScan complete.")
 print(f"Files analyzed: {total_files}")
 print(f"Warnings found: {total_findings}")
         
+report_path = project_folder / "reports" / "sleuthra_report.json"
 
+save_json_report(analysis_results, report_path)

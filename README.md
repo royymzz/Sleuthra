@@ -24,6 +24,8 @@ Sleuthra currently supports:
 - Structured forensic findings for detected anomalies
 - Structured per-file analysis results for future reporting
 - End-of-scan summary showing files analyzed and warnings found
+- JSON forensic report generation
+- Relative file paths preserved in reports
 
 ## Example Finding
 
