@@ -106,14 +106,50 @@ def analyze_file(file_path, scan_folder):
 
     return result
 
-def save_json_report(results, report_path): 
+def save_json_report(results, duplicate_groups, report_path):
     report_path.parent.mkdir(parents=True, exist_ok=True)
 
+    total_findings = sum(
+        len(result["findings"])
+        for result in results
+    )
+
+    report = {
+        "summary": {
+            "files_analyzed": len(results),
+            "warnings_found": total_findings,
+            "duplicate_groups": len(duplicate_groups),
+        },
+        "files": results,
+        "exact_duplicates": duplicate_groups,
+    }
+
     with open(report_path, "w", encoding="utf-8") as report_file:
-        json.dump(results, report_file, indent=4)
+        json.dump(report, report_file, indent=4)
 
     print(f"\nJSON report saved: {report_path}")
 
+
+def find_exact_duplicates(results):
+    hash_groups = {}
+
+    for result in results:
+        file_hash = result["sha256"]
+        file_path = result["path"]
+
+        if file_hash not in hash_groups:
+            hash_groups[file_hash] = []
+
+        hash_groups[file_hash].append(file_path)
+
+    duplicate_groups = {}
+
+    for file_hash, paths in hash_groups.items():
+        if len(paths) > 1:
+            duplicate_groups[file_hash] = paths 
+
+    return duplicate_groups 
+        
 
 project_folder = Path(__file__).resolve().parent
 
@@ -143,10 +179,26 @@ total_findings = sum(
     for result in analysis_results
 )
 
+duplicate_groups = find_exact_duplicates(analysis_results)
+
 print("\nScan complete.")
 print(f"Files analyzed: {total_files}")
 print(f"Warnings found: {total_findings}")
+print(f"Duplicate groups: {len(duplicate_groups)}")
+
+if duplicate_groups:
+    print("\nExact Duplicates:")
+
+    for file_hash, paths in duplicate_groups.items():
+        print(f"\n SHA-256: {file_hash}")
+
+        for path in paths: 
+            print(f"  - {path}")
         
 report_path = project_folder / "reports" / "sleuthra_report.json"
 
-save_json_report(analysis_results, report_path)
+save_json_report(
+    analysis_results,
+    duplicate_groups,
+    report_path
+)

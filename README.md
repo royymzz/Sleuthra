@@ -26,6 +26,8 @@ Sleuthra currently supports:
 - End-of-scan summary showing files analyzed and warnings found
 - JSON forensic report generation
 - Relative file paths preserved in reports
+- Exact duplicate detection using SHA-256 hashes
+- Duplicate groups included in JSON forensic reports
 
 ## Example Finding
 
