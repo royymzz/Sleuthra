@@ -28,6 +28,9 @@ Sleuthra currently supports:
 - Relative file paths preserved in reports
 - Exact duplicate detection using SHA-256 hashes
 - Duplicate groups included in JSON forensic reports
+- File-signature verification using magic bytes
+- Signature checks for PDF, JPEG, PNG, GIF, and ZIP files
+- Invalid file-signature findings for supported extensions
 
 ## Example Finding
 

@@ -43,6 +43,31 @@ def check_extension_mismatch(file_path, detected_type):
 
     return True
 
+def check_file_signature(file_path):
+    signatures = {
+        ".pdf": [b"%PDF"],
+        ".jpg": [b"\xff\xd8\xff"],
+        ".jpeg": [b"\xff\xd8\xff"],
+        ".png": [b"\x89PNG\r\n\x1a\n"],
+        ".gif": [b"GIF87a", b"GIF89a"],
+        ".zip": [b"PK\x03\x04"],
+    }
+
+    extension = file_path.suffix.lower()
+
+    if extension not in signatures:
+        return None
+
+    with open(file_path, "rb") as file:
+        header = file.read(16)
+
+    for signature in signatures[extension]:
+        if header.startswith(signature):
+            return True
+
+    return False
+
+
 def analyze_file(file_path, scan_folder):
     findings = []
 
@@ -74,12 +99,26 @@ def analyze_file(file_path, scan_folder):
     detected_type = detect_file_type(file_path)
     print(f" Detected type: {detected_type}")
 
+    signature_valid = check_file_signature(file_path)
+
+    if signature_valid is True:
+        print(" File signature: VALID")
+    elif signature_valid is False:
+        print(" File signature: INVALID")
+    else: 
+        print(" File signature: NOT CHECKED")
+        
     mismatch = check_extension_mismatch(file_path, detected_type)
 
     if mismatch:
         findings.append(
             f"Extension mismatch: {file_path.suffix} extension, "
             f"but detected as {detected_type}"
+        )
+
+    if signature_valid is False:
+        findings.append(
+            f"Invalid file signature for {file_path.suffix} extension"
         )
 
     if findings:
@@ -101,6 +140,7 @@ def analyze_file(file_path, scan_folder):
         "metadata_changed": changed_time,
         "sha256": file_hash,
         "detected_type": detected_type,
+        "signature_valid": signature_valid,
         "findings": findings,
     }
 
