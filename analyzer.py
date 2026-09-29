@@ -22,6 +22,23 @@ def detect_file_type(file_path):
     )
     return result.stdout.strip()
 
+def categorize_file(detected_type):
+    detected_lower = detected_type.lower()
+
+    if "image" in detected_lower:
+        return "Image"
+
+    if "pdf document" in detected_lower:
+        return "Document"
+
+    if "zip archive" in detected_lower:
+        return "Archive"
+
+    if "text" in detected_lower:
+        return "Text"
+
+    return "Other"
+
 def check_extension_mismatch(file_path, detected_type):
     extension = file_path.suffix.lower()
 
@@ -108,7 +125,9 @@ def analyze_file(file_path, scan_folder):
     print(f" SHA-256: {file_hash}")
 
     detected_type = detect_file_type(file_path)
+    category = categorize_file(detected_type)
     print(f" Detected type: {detected_type}")
+    print(f" Category: {category}")
 
     signature_valid = check_file_signature(file_path)
 
@@ -151,6 +170,7 @@ def analyze_file(file_path, scan_folder):
         "metadata_changed": changed_time,
         "sha256": file_hash,
         "detected_type": detected_type,
+        "category": category,
         "signature_valid": signature_valid,
         "findings": findings,
     }
@@ -203,71 +223,78 @@ def find_exact_duplicates(results):
 
     for file_hash, paths in hash_groups.items():
         if len(paths) > 1:
-            duplicate_groups[file_hash] = paths 
+            duplicate_groups[file_hash] = paths
 
-    return duplicate_groups 
+    return duplicate_groups
         
 
 project_folder = Path(__file__).resolve().parent
 
-print("Sleuthra - File Forensics Analyzer")
-print(f"Project folder: {project_folder}")
+def main():
+    project_folder = Path(__file__).resolve().parent
 
-args = parse_arguments()
+    print("Sleuthra - File Forensics Analyzer")
+    print(f"Project folder: {project_folder}")
 
-scan_folder = Path(args.scan_path).expanduser().resolve()
+    args = parse_arguments()
 
-if not scan_folder.exists():
-    print(f"Error: Scan folder does not exist: {scan_folder}")
-    raise SystemExit(1)
+    scan_folder = Path(args.scan_path).expanduser().resolve()
 
-if not scan_folder.is_dir():
-    print(f"Error: Scan path is not a directory: {scan_folder}")
-    raise SystemExit(1)
+    if not scan_folder.exists():
+        print(f"Error: Scan folder does not exist: {scan_folder}")
+        raise SystemExit(1)
 
-print(f"\nScanning: {scan_folder}")
+    if not scan_folder.is_dir():
+        print(f"Error: Scan path is not a directory: {scan_folder}")
+        raise SystemExit(1)
 
-analysis_results = []
+    print(f"\nScanning: {scan_folder}")
 
-for item in sorted(scan_folder.rglob("*")):
-    if item.is_file():
-        result = analyze_file(item, scan_folder)
-        analysis_results.append(result)
+    analysis_results = []
 
-total_files = len(analysis_results)
+    for item in sorted(scan_folder.rglob("*")):
+        if item.is_file():
+            result = analyze_file(item, scan_folder)
+            analysis_results.append(result)
 
-files_with_findings = sum(
-    1
-    for result in analysis_results
-    if result["findings"]
-)
+    total_files = len(analysis_results)
 
-duplicate_groups = find_exact_duplicates(analysis_results)
+    files_with_findings = sum(
+        1
+        for result in analysis_results
+        if result["findings"]
+    )
 
-total_findings = sum(
-    len(result["findings"])
-    for result in analysis_results
-)
+    duplicate_groups = find_exact_duplicates(analysis_results)
 
-print("\nScan complete.")
-print(f"Files analyzed: {total_files}")
-print(f"Files with findings: {files_with_findings}")
-print(f"Total findings: {total_findings}")
-print(f"Duplicate groups: {len(duplicate_groups)}")
+    total_findings = sum(
+        len(result["findings"])
+        for result in analysis_results
+    )
 
-if duplicate_groups:
-    print("\nExact Duplicates:")
+    print("\nScan complete.")
+    print(f"Files analyzed: {total_files}")
+    print(f"Files with findings: {files_with_findings}")
+    print(f"Total findings: {total_findings}")
+    print(f"Duplicate groups: {len(duplicate_groups)}")
 
-    for file_hash, paths in duplicate_groups.items():
-        print(f"\n SHA-256: {file_hash}")
+    if duplicate_groups:
+        print("\nExact Duplicates:")
 
-        for path in paths: 
-            print(f"  - {path}")
-        
-report_path = project_folder / "reports" / "sleuthra_report.json"
+        for file_hash, paths in duplicate_groups.items():
+            print(f"\n SHA-256: {file_hash}")
 
-save_json_report(
-    analysis_results,
-    duplicate_groups,
-    report_path
-)
+            for path in paths:
+                print(f"  - {path}")
+
+    report_path = project_folder / "reports" / "sleuthra_report.json"
+
+    save_json_report(
+        analysis_results,
+        duplicate_groups,
+        report_path
+    )
+
+
+if __name__ == "__main__":
+    main()

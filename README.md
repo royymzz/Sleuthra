@@ -8,31 +8,36 @@ The project is being developed as a learning-focused digital forensics tool for 
 
 ## Current Features
 
-Sleuthra currently supports:
+### File Analysis
 
-- Recursive file discovery across a target directory and its subdirectories
-- File extension identification
-- File size collection
-- SHA-256 hashing
+- Recursive directory scanning
+- File size and filesystem timestamp collection
+- SHA-256 hashing for file integrity and identification
 - Content-based file type detection using the Linux `file` utility
-- Detection of file extension/content mismatches
-- Filesystem timestamp collection:
-  - Modification time
-  - Access time
-  - Metadata change time
-- Basic error handling for missing scan directories
-- Structured forensic findings for detected anomalies
-- Structured per-file analysis results for future reporting
-- End-of-scan summary showing files analyzed and warnings found
-- JSON forensic report generation
-- Relative file paths preserved in reports
+- File-signature verification using magic bytes for PDF, JPEG, PNG, GIF, and ZIP files
+- Content-based file categorization into Image, Document, Archive, Text, or Other
+
+### Forensic Findings
+
+- File extension/content mismatch detection
+- Invalid file-signature detection for supported file types
+- Structured findings for detected anomalies
 - Exact duplicate detection using SHA-256 hashes
-- Duplicate groups included in JSON forensic reports
-- File-signature verification using magic bytes
-- Signature checks for PDF, JPEG, PNG, GIF, and ZIP files
-- Invalid file-signature findings for supported extensions
-- Command-line directory selection for scanning arbitrary folders
-- Scan-path validation for missing or invalid directories
+
+### Reporting
+
+- Structured per-file analysis results
+- JSON forensic report generation
+- Relative file paths and file categories preserved in reports
+- Scan summaries showing files analyzed, files with findings, total findings, and duplicate groups
+
+### Command-Line Interface
+
+- User-selected scan directories
+- Support for relative and absolute scan paths
+- Recursive analysis of nested directories
+- Validation of missing or invalid scan paths
+- Built-in command-line help
 
 ## Example Finding
 
@@ -127,7 +132,7 @@ Planned areas of development include:
 - Additional metadata extraction
 - Improved file-type analysis
 - Automated forensic indicators
-- File categorization and evidence filtering
+- Evidence filtering and category-based analysis
 - Improved testing and validation
 - Timeline and evidence relationship analysis
 
