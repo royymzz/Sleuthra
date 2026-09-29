@@ -160,6 +160,12 @@ def analyze_file(file_path, scan_folder):
 def save_json_report(results, duplicate_groups, report_path):
     report_path.parent.mkdir(parents=True, exist_ok=True)
 
+    files_with_findings = sum(
+        1
+        for result in results
+        if result["findings"]
+    )
+
     total_findings = sum(
         len(result["findings"])
         for result in results
@@ -168,7 +174,8 @@ def save_json_report(results, duplicate_groups, report_path):
     report = {
         "summary": {
             "files_analyzed": len(results),
-            "warnings_found": total_findings,
+            "files_with_findings": files_with_findings,
+            "total_findings": total_findings,
             "duplicate_groups": len(duplicate_groups),
         },
         "files": results,
@@ -179,7 +186,6 @@ def save_json_report(results, duplicate_groups, report_path):
         json.dump(report, report_file, indent=4)
 
     print(f"\nJSON report saved: {report_path}")
-
 
 def find_exact_duplicates(results):
     hash_groups = {}
@@ -230,16 +236,23 @@ for item in sorted(scan_folder.rglob("*")):
 
 total_files = len(analysis_results)
 
+files_with_findings = sum(
+    1
+    for result in analysis_results
+    if result["findings"]
+)
+
+duplicate_groups = find_exact_duplicates(analysis_results)
+
 total_findings = sum(
     len(result["findings"])
     for result in analysis_results
 )
 
-duplicate_groups = find_exact_duplicates(analysis_results)
-
 print("\nScan complete.")
 print(f"Files analyzed: {total_files}")
-print(f"Warnings found: {total_findings}")
+print(f"Files with findings: {files_with_findings}")
+print(f"Total findings: {total_findings}")
 print(f"Duplicate groups: {len(duplicate_groups)}")
 
 if duplicate_groups:
