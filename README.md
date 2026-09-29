@@ -31,6 +31,8 @@ Sleuthra currently supports:
 - File-signature verification using magic bytes
 - Signature checks for PDF, JPEG, PNG, GIF, and ZIP files
 - Invalid file-signature findings for supported extensions
+- Command-line directory selection for scanning arbitrary folders
+- Scan-path validation for missing or invalid directories
 
 ## Example Finding
 
@@ -49,7 +51,8 @@ ASCII text
 Sleuthra flags this discrepancy:
 
 ```text
-WARNING: File extension does not match detected content!
+[WARNING] Extension mismatch: .jpg extension, but detected as ASCII text
+[WARNING] Invalid file signature for .jpg extension
 ```
 
 This type of inconsistency can be useful during forensic file examination.
@@ -63,10 +66,20 @@ Sleuthra/
 ├── .gitignore
 └── test_files/
     ├── example.txt
-    └── fake_image.jpg
+    ├── fake_image.jpg
+    ├── evidence/
+    │   ├── nested.txt
+    │   └── documents/
+    │       └── deep.txt
+    └── signature_tests/
+        ├── valid.gif
+        ├── valid.jpg
+        ├── valid.pdf
+        ├── valid.png
+        └── valid.zip
 ```
 
-The files in `test_files/` are small synthetic test samples used during development.
+The files in `test_files/` are small synthetic test samples used during development and validation.
 
 Real forensic evidence should not be stored in the repository.
 
@@ -74,15 +87,27 @@ Real forensic evidence should not be stored in the repository.
 
 Sleuthra currently requires Python 3 and the Linux `file` utility.
 
-Run the analyzer from the project directory:
+Run the analyzer from the project directory and provide the directory to analyze:
 
 ```bash
-python analyzer.py
+python analyzer.py test_files
 ```
 
-The analyzer currently scans the local `test_files` directory recursively, including files inside nested subdirectories.
+Sleuthra also accepts other relative or absolute directory paths:
 
-At the end of a scan, Sleuthra reports the number of files analyzed and the total number of warnings found.
+```bash
+python analyzer.py ~/Documents/evidence
+```
+
+Display command-line help with:
+
+```bash
+python analyzer.py --help
+```
+
+The selected directory is scanned recursively, including files inside nested subdirectories.
+
+At the end of a scan, Sleuthra reports the number of files analyzed, findings detected, and exact duplicate groups. A structured JSON report is also generated in the local `reports/` directory.
 
 ## Forensic Considerations
 
@@ -99,11 +124,12 @@ For example:
 
 Planned areas of development include:
 
-- Structured report generation
 - Additional metadata extraction
 - Improved file-type analysis
 - Automated forensic indicators
-- Testing and validation
+- File categorization and evidence filtering
+- Improved testing and validation
+- Timeline and evidence relationship analysis
 
 The roadmap may change as the project develops.
 

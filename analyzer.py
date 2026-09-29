@@ -2,6 +2,7 @@ from pathlib import Path
 import hashlib 
 import subprocess
 import json
+import argparse
 from datetime import datetime
 
 def calculate_sha256(file_path):
@@ -67,6 +68,16 @@ def check_file_signature(file_path):
 
     return False
 
+def parse_arguments():
+    parser = argparse.ArgumentParser(
+        description="Sleuthra - File Forensics Analyzer"
+    )
+    parser.add_argument(
+        "scan_path",
+        help="Directory containing files to analyze"
+    )
+
+    return parser.parse_args()
 
 def analyze_file(file_path, scan_folder):
     findings = []
@@ -196,11 +207,16 @@ project_folder = Path(__file__).resolve().parent
 print("Sleuthra - File Forensics Analyzer")
 print(f"Project folder: {project_folder}")
 
+args = parse_arguments()
 
-scan_folder = project_folder / "test_files"
+scan_folder = Path(args.scan_path).expanduser().resolve()
 
 if not scan_folder.exists():
     print(f"Error: Scan folder does not exist: {scan_folder}")
+    raise SystemExit(1)
+
+if not scan_folder.is_dir():
+    print(f"Error: Scan path is not a directory: {scan_folder}")
     raise SystemExit(1)
 
 print(f"\nScanning: {scan_folder}")
